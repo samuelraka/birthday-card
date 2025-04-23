@@ -7,6 +7,9 @@
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
     <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
     @vite('resources/css/app.css')
+    <script src="/js/memory-game.js"></script>
+    <script src="/js/snake-game.js"></script>
+    <script src="/js/puzzle-game.js"></script>
 </head>
 <body class="bg-gray-800 font-['Press_Start_2P'] text-[#0f380f]">
     <div class="max-w-md mx-auto min-h-screen p-8" x-data="{ 
@@ -18,6 +21,7 @@
             document.dispatchEvent(event);
         }
     }">
+    <div x-data @keydown.window.a="$dispatch('next-tab')" @keydown.window.b="$dispatch('prev-tab')">
         <!-- Gameboy Device Frame -->
         <div class="bg-[#c0c0c0] rounded-[20px] p-6 shadow-xl relative">
             <!-- Power LED -->
@@ -54,9 +58,11 @@
                 </div>
                 
                 <!-- A B Buttons -->
-                <div class="flex gap-4">
-                    <a href="{{ route('gallery') }}" class="w-12 h-12 bg-[#303030] rounded-full flex items-center justify-center text-white hover:bg-[#404040]">A</a>
-                    <a href="{{ route('games') }}" class="w-12 h-12 bg-[#303030] rounded-full flex items-center justify-center text-white hover:bg-[#404040]">B</a>
+                <div class="flex justify-end space-x-4 mt-4">
+                    <div class="flex items-center space-x-1">
+                        <button @click="$dispatch('prev-tab')" class="w-12 h-12 bg-[#ab3c20] text-[#9bbc0f] rounded-full shadow-lg text-sm font-bold">A</button>
+                        <button @click="$dispatch('next-tab')" class="w-12 h-12 bg-[#ab3c20] text-[#9bbc0f] rounded-full shadow-lg text-sm font-bold">B</button>
+                    </div>
                 </div>
             </div>
             
