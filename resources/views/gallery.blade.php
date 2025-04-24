@@ -11,7 +11,7 @@
                 this.activeIndex = 0;
                 this.photos = ['photo1.jpg', 'photo2.jpg', 'photo3.jpg', 'photo4.jpg'];
                 this.videos = ['video1.mp4', 'video2.mp4'];
-                this.songs = ['blackbear.mp3', 'sample-song.mp3'];
+                this.songs = ['Taylor Swift - White Horse.mp3', 'Chase Atlantic - Swim.mp3', 'NIKI - You ll Be in My Heart.mp3'];
                 this.tabs = ['photos', 'videos', 'songs'];
             },
             nextTab() {
