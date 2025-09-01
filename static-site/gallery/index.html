@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Birthday Gameboy</title>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <link rel="stylesheet" href="../css/app.css">
+    <script src="../js/app.js"></script>
+    <style>
+        .gameboy-scrollbar {
+            scrollbar-width: thin;
+            scrollbar-color: #0f380f #9bbc0f;
+        }
+        .gameboy-scrollbar::-webkit-scrollbar {
+            width: 6px;
+        }
+        .gameboy-scrollbar::-webkit-scrollbar-track {
+            background: #9bbc0f;
+        }
+        .gameboy-scrollbar::-webkit-scrollbar-thumb {
+            background-color: #0f380f;
+            border-radius: 3px;
+        }
+
+        .transition-opacity {
+            transition: opacity 0.3s ease-in-out;
+        }
+
+        /* Custom video player styles */
+        video::-webkit-media-controls-panel {
+            background: #9bbc0f;
+        }
+        video::-webkit-media-controls-play-button,
+        video::-webkit-media-controls-volume-slider,
+        video::-webkit-media-controls-timeline {
+            filter: invert(1);
+        }
+
+        /* Custom range input for volume */
+        .gameboy-range {
+            -webkit-appearance: none;
+            background: #0f380f;
+            border-radius: 2px;
+            height: 4px;
+        }
+
+        .gameboy-range::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 8px;
+            height: 8px;
+            background: #0f380f;
+            border: 2px solid #9bbc0f;
+            border-radius: 2px;
+            cursor: pointer;
+        }
+
+        .gameboy-range::-moz-range-thumb {
+            width: 8px;
+            height: 8px;
+            background: #0f380f;
+            border: 2px solid #9bbc0f;
+            border-radius: 2px;
+            cursor: pointer;
+        }
+
+        /* Progress bar animation */
+        @keyframes progress-pulse {
+            0% { background-color: #306230; }
+            50% { background-color: #0f380f; }
+            100% { background-color: #306230; }
+        }
+
+        .progress-bar {
+            animation: progress-pulse 2s infinite;
+        }
+    </style>
+</head>
+<body class="bg-gray-800 font-['Press_Start_2P'] text-[#0f380f]">
+    <div class="max-w-md mx-auto min-h-screen p-8" x-data="{ 
+        dispatchArrowKey(direction) {
+            const event = new KeyboardEvent('keydown', {
+                key: direction,
+                bubbles: true
+            });
+            document.dispatchEvent(event);
+        }
+    }">
+    <div x-data @keydown.window.a="$dispatch('next-tab')" @keydown.window.b="$dispatch('prev-tab')">
+        <!-- Gameboy Device Frame -->
+        <div class="bg-[#c0c0c0] rounded-[20px] p-6 shadow-xl relative">
+            <!-- Power LED -->
+            <div class="absolute top-4 left-8 flex items-center">
+                <div class="w-2 h-2 bg-red-500 rounded-full mr-2"></div>
+                <span class="text-[8px]">POWER</span>
+            </div>
+            
+            <!-- Screen Frame -->
+            <div class="bg-[#9ca3af] p-4 rounded-lg mb-6">
+                <!-- Screen -->
+                <div class="bg-[#9bbc0f] p-4 rounded min-h-[240px] shadow-inner">
+                    <div class="space-y-4" x-data="gallery" x-init="init()" @next-tab.window="nextTab()" @prev-tab.window="prevTab()" x-ref="gallery">
+                        <!-- Start Screen -->
+                        <div x-show="!started" class="text-center space-y-4">
+                            <div class="text-xs animate-pulse">PRESS START</div>
+                            <button @click="startGallery()" 
+                                    class="px-4 py-2 border-2 border-[#0f380f] bg-[#9bbc0f] hover:bg-[#0f380f] hover:text-[#9bbc0f] text-[10px] focus:outline-none transition-colors">
+                                START
+                            </button>
+                        </div>
+
+                        <!-- Main Content -->
+                        <div x-show="started" x-transition:enter="transition ease-out duration-300"
+                            x-transition:enter-start="opacity-0 transform scale-95"
+                            x-transition:enter-end="opacity-100 transform scale-100">
+                            <!-- Back Button -->
+                            <a href="../index.html" class="text-[8px] block mb-2">← BACK</a>
+
+                        <!-- Tab Navigation -->
+                        <div class="flex justify-between text-[10px] mb-4">
+                            <button @click="activeTab = 'photos'" :class="{ 'text-[#0f380f] font-bold': activeTab === 'photos', 'opacity-50': activeTab !== 'photos' }">PHOTOS</button>
+                            <button @click="activeTab = 'videos'" :class="{ 'text-[#0f380f] font-bold': activeTab === 'videos', 'opacity-50': activeTab !== 'videos' }">VIDEOS</button>
+                            <button @click="activeTab = 'songs'" :class="{ 'text-[#0f380f] font-bold': activeTab === 'songs', 'opacity-50': activeTab !== 'songs' }">SONGS</button>
+                        </div>
+
+                        <!-- Button Instructions -->
+                        <div class="text-[8px] text-center mb-2">
+                            <span class="mr-4">A: PREV TAB</span>
+                            <span>B: NEXT TAB</span>
+                        </div>
+
+                        <!-- Content Area -->
+                        <div class="border-4 border-[#0f380f] p-2 mt-4 overflow-y-auto max-h-[240px] gameboy-scrollbar">
+                            <!-- Photos Tab -->
+                            <div x-show="activeTab === 'photos'" class="space-y-4">
+                                <div class="text-center mb-4">
+                                    <div class="text-[12px] font-bold text-[#0f380f]">HERE'S THE TOP PHOTOS OF YOU</div>
+                                    <div class="text-[8px] text-[#306230]">Every moment with you is picture perfect ♥</div>
+                                </div>
+                                <div class="grid grid-cols-2 gap-2">
+                                    <template x-for="(photo, index) in photos" :key="index">
+                                        <div class="aspect-square border-2 border-[#0f380f] p-1 cursor-pointer transition-opacity duration-500"
+                                            :class="{ 'opacity-100': showContent, 'opacity-0': !showContent }"
+                                            @click="activeIndex = index; showContent = false; setTimeout(() => showContent = true, 300)">
+                                            <img :src="'../images/' + photo" class="w-full h-full object-cover" alt="Memory">
+                                        </div>
+                                    </template>
+                                </div>
+                            </div>
+
+                            <!-- Videos Tab -->
+                            <div x-show="activeTab === 'videos'" class="space-y-4">
+                                <div class="text-center mb-4">
+                                    <div class="text-[12px] font-bold text-[#0f380f]">HERE'S THE TOP VIDEOS OF YOU</div>
+                                    <div class="text-[8px] text-[#306230]">Capturing your beautiful moments in motion ♥</div>
+                                </div>
+                                <div class="space-y-4" x-data="{
+                                currentVideo: null,
+                                isPlaying: false,
+                                currentTime: 0,
+                                duration: 0,
+                                progress: 0,
+                                volume: 0.5,
+                                formatTime(seconds) {
+                                    return new Date(seconds * 1000).toISOString().substr(14, 5);
+                                }
+                            }">
+                                <template x-for="(video, index) in videos" :key="index">
+                                    <div class="border-2 border-[#0f380f] p-2 transition-opacity duration-500 bg-[#9bbc0f] song-item" 
+                                        :class="{ 'opacity-100': showContent, 'opacity-0': !showContent }">
+                                        <div class="text-[10px] mb-2 font-bold" x-text="video"></div>
+                                        
+                                        <div class="relative aspect-video bg-[#0f380f] overflow-hidden mb-2">
+                                            <video class="w-full h-full" 
+                                                :src="'../videos/' + video" 
+                                                :data-video="video"
+                                                @loadedmetadata="$el.volume = volume" 
+                                                @timeupdate="currentTime = Math.floor($el.currentTime); duration = Math.floor($el.duration); progress = ($el.currentTime / $el.duration) * 100"
+                                                @ended="isPlaying = false"
+                                                preload="metadata">
+                                                Your browser does not support the video tag.
+                                            </video>
+                                        </div>
+
+                                        <!-- Custom Video Controls -->
+                                        <div class="space-y-2">
+                                            <!-- Progress Bar -->
+                                            <div class="h-2 bg-[#0f380f] relative cursor-pointer" 
+                                                @click="const video = $el.closest('.song-item').querySelector('video'); if(video && duration) { video.currentTime = ($event.offsetX / $event.target.offsetWidth) * duration; }">
+                                                <div class="h-full bg-[#306230] transition-all duration-300"
+                                                    :style="`width: ${progress}%`"></div>
+                                            </div>
+                                            
+                                            <!-- Time Display -->
+                                            <div class="flex justify-between text-[8px] font-mono">
+                                                <span x-text="formatTime(currentTime)">00:00</span>
+                                                <span x-text="formatTime(duration)">00:00</span>
+                                            </div>
+                                            
+                                            <!-- Control Buttons -->
+                                            <div class="flex justify-between items-center">
+                                                <button class="px-3 py-1 border-2 border-[#0f380f] hover:bg-[#0f380f] hover:text-[#9bbc0f] text-[8px] focus:outline-none"
+                                                        @click="const video = $el.closest('.song-item').querySelector('video'); if(video) { 
+                                                            if (currentVideo !== video.dataset.video) {
+                                                                if (currentVideo) {
+                                                                    const oldVideo = document.querySelector(`video[data-video='${currentVideo}']`);
+                                                                    if (oldVideo) {
+                                                                        oldVideo.pause();
+                                                                        oldVideo.currentTime = 0;
+                                                                    }
+                                                                }
+                                                                currentVideo = video.dataset.video;
+                                                                isPlaying = true;
+                                                                video.play();
+                                                            } else {
+                                                                isPlaying = !isPlaying;
+                                                                isPlaying ? video.play() : video.pause();
+                                                            }
+                                                        }">
+                                                    <span x-text="currentVideo === video && isPlaying ? 'PAUSE' : 'PLAY'">PLAY</span>
+                                                </button>
+                                                
+                                                <!-- Volume Control -->
+                                                <div class="flex items-center space-x-1">
+                                                    <span class="text-[8px]">VOL</span>
+                                                    <input type="range" 
+                                                        class="w-16 h-1 gameboy-range" 
+                                                        min="0" 
+                                                        max="1" 
+                                                        step="0.1"
+                                                        x-model="volume"
+                                                        @input="const video = $el.closest('.song-item').querySelector('video'); if(video) { video.volume = volume; }">
+                                                </div>
+                                                
+                                                <button class="px-3 py-1 border-2 border-[#0f380f] hover:bg-[#0f380f] hover:text-[#9bbc0f] text-[8px] focus:outline-none"
+                                                        @click="const video = $el.closest('.song-item').querySelector('video'); if(video) { video.pause(); video.currentTime = 0; isPlaying = false; currentVideo = null; }">
+                                                    STOP
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </template>
+                            </div>
+                            </div>
+
+                            <!-- Songs Tab -->
+                            <div x-show="activeTab === 'songs'" class="space-y-4">
+                                <div class="text-center mb-4">
+                                    <div class="text-[12px] font-bold text-[#0f380f]">HERE'S THE TOP SONGS OF YOU</div>
+                                    <div class="text-[8px] text-[#306230]">The soundtrack of our love story ♥</div>
+                                </div>
+                                <div class="space-y-4" x-data="{
+                                currentSong: null,
+                                isPlaying: false,
+                                currentTime: 0,
+                                duration: 0,
+                                progress: 0,
+                                volume: 0.5,
+
+                                formatTime(seconds) {
+                                    return new Date(seconds * 1000).toISOString().substr(14, 5);
+                                },
+
+                                seekAudio(event, audioEl) {
+                                    if (audioEl && audioEl.duration) {
+                                        const rect = event.target.getBoundingClientRect();
+                                        const x = event.clientX - rect.left;
+                                        const width = rect.width;
+                                        const percentage = x / width;
+                                        audioEl.currentTime = percentage * audioEl.duration;
+                                    }
+                                }
+                            }">
+                                <template x-for="(song, index) in songs" :key="index">
+                                    <div class="border-2 border-[#0f380f] p-2 bg-[#9bbc0f] song-item">
+                                        <div class="text-[10px] mb-2 font-bold" x-text="song"></div>
+                                        
+                                        <!-- Hidden Audio Element -->
+                                        <audio :src="'../songs/' + song" :data-song="song" @loadedmetadata="$el.volume = volume" preload="metadata" class="hidden"
+                                            @timeupdate="currentTime = Math.floor($el.currentTime); duration = Math.floor($el.duration); progress = ($el.currentTime / $el.duration) * 100"
+                                            @ended="isPlaying = false"></audio>
+                                        
+                                        <!-- Custom Player Controls -->
+                                        <div class="space-y-2">
+                                            <!-- Progress Bar -->
+                                            <div class="h-2 bg-[#0f380f] relative cursor-pointer" 
+                                                @click="seekAudio($event, $el.closest('.song-item').querySelector('audio'))">
+                                                <div class="h-full bg-[#306230] transition-all duration-300 progress-bar"
+                                                    :style="`width: ${progress}%`"></div>
+                                            </div>
+                                            
+                                            <!-- Time Display -->
+                                            <div class="flex justify-between text-[8px] font-mono">
+                                                <span x-text="formatTime(currentTime)">00:00</span>
+                                                <span x-text="formatTime(duration)">00:00</span>
+                                            </div>
+                                            
+                                            <!-- Control Buttons -->
+                                            <div class="flex justify-between items-center">
+                                                <button class="px-3 py-1 border-2 border-[#0f380f] hover:bg-[#0f380f] hover:text-[#9bbc0f] text-[8px] focus:outline-none"
+                                                        @click="const audio = $el.closest('.song-item').querySelector('audio'); if(audio) { 
+                                                            if (currentSong !== song) {
+                                                                if (currentSong) {
+                                                                    const oldAudio = document.querySelector(`audio[data-song='${currentSong}']`);
+                                                                    if (oldAudio) {
+                                                                        oldAudio.pause();
+                                                                        oldAudio.currentTime = 0;
+                                                                    }
+                                                                }
+                                                                currentSong = song;
+                                                                isPlaying = true;
+                                                                audio.play();
+                                                            } else {
+                                                                isPlaying = !isPlaying;
+                                                                isPlaying ? audio.play() : audio.pause();
+                                                            }
+                                                        }">
+                                                    <span x-text="currentSong === song && isPlaying ? 'PAUSE' : 'PLAY'">PLAY</span>
+                                                </button>
+                                                
+                                                <!-- Volume Control -->
+                                                <div class="flex items-center space-x-1">
+                                                    <span class="text-[8px]">VOL</span>
+                                                    <input type="range" 
+                                                        class="w-16 h-1 gameboy-range" 
+                                                        min="0" 
+                                                        max="1" 
+                                                        step="0.1"
+                                                        x-model="volume"
+                                                        @input="$el.closest('.song-item').querySelector('audio').volume = volume">
+                                                </div>
+                                                
+                                                <button class="px-3 py-1 border-2 border-[#0f380f] hover:bg-[#0f380f] hover:text-[#9bbc0f] text-[8px] focus:outline-none"
+                                                        @click="const audio = $el.closest('.song-item').querySelector('audio'); if(audio) { audio.pause(); audio.currentTime = 0; isPlaying = false; currentSong = null; }">
+                                                    STOP
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </template>
+                            </div>
+                        </div>
+
+                        <!-- Navigation Instructions -->
+                        <div class="text-[8px] text-center mt-2">
+                            <div>USE ↑↓ TO SCROLL</div>
+                            <div>PRESS A TO VIEW</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- D-Pad -->
+            <div class="flex justify-between items-center mb-4">
+                <div class="relative w-24 h-24">
+                    <!-- Up button -->
+                    <div class="absolute w-8 h-8 bg-[#303030] left-8 top-0 rounded-t cursor-pointer hover:bg-[#404040] active:bg-[#505050]"
+                         @click="dispatchArrowKey('ArrowUp')"></div>
+                    <!-- Down button -->
+                    <div class="absolute w-8 h-8 bg-[#303030] left-8 bottom-0 rounded-b cursor-pointer hover:bg-[#404040] active:bg-[#505050]"
+                         @click="dispatchArrowKey('ArrowDown')"></div>
+                    <!-- Left button -->
+                    <div class="absolute w-8 h-8 bg-[#303030] left-0 top-8 rounded-l cursor-pointer hover:bg-[#404040] active:bg-[#505050]"
+                         @click="dispatchArrowKey('ArrowLeft')"></div>
+                    <!-- Right button -->
+                    <div class="absolute w-8 h-8 bg-[#303030] right-0 top-8 rounded-r cursor-pointer hover:bg-[#404040] active:bg-[#505050]"
+                         @click="dispatchArrowKey('ArrowRight')"></div>
+                    <!-- Center dot -->
+                    <div class="absolute w-8 h-8 bg-[#303030] left-8 top-8 rounded-sm"></div>
+                </div>
+                
+                <!-- A B Buttons -->
+                <div class="flex justify-end space-x-4 mt-4">
+                    <div class="flex items-center space-x-1">
+                        <button @click="$dispatch('prev-tab')" class="w-12 h-12 bg-[#ab3c20] text-[#9bbc0f] rounded-full shadow-lg text-sm font-bold">A</button>
+                        <button @click="$dispatch('next-tab')" class="w-12 h-12 bg-[#ab3c20] text-[#9bbc0f] rounded-full shadow-lg text-sm font-bold">B</button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Start Select Buttons -->
+            <div class="flex justify-center gap-8">
+                <button @click="dispatchArrowKey('Enter')" class="w-16 h-6 bg-[#303030] rounded-pill transform -rotate-12 flex items-center justify-center text-[10px] text-white hover:bg-[#404040] active:bg-[#505050]">SELECT</button>
+                <a href="../index.html" class="w-16 h-6 bg-[#303030] rounded-pill transform -rotate-12 flex items-center justify-center text-[10px] text-white hover:bg-[#404040] active:bg-[#505050]">START</a>
+            </div>
+            
+            <!-- Nintendo Logo -->
+            <div class="text-center mt-6">
+                <span class="text-[#303030] text-sm">Nintendo</span>
+            </div>
+        </div>
+    </div>
+    <script>
+        document.addEventListener('alpine:init', () => {
+            Alpine.data('gallery', () => ({
+                init() {
+                    this.started = false;
+                    this.showContent = true;
+                    this.activeTab = 'photos';
+                    this.activeIndex = 0;
+                    this.photos = ['photo1.jpg', '2.jpg', '3.jpg', '4.jpg', '5.jpg', '6.jpg', '7.jpg', '8.jpg'];
+                    this.videos = ['1.mp4', '2.mp4', '3.mp4', '4.mp4', '5.mp4', '6.mp4', '7.mp4', '8.mp4', '9.mp4', '10.mp4'];
+                    this.songs = ['Taylor Swift - White Horse.mp3', 'Chase Atlantic - Swim.mp3', 'NIKI - You ll Be in My Heart.mp3', '.Feast - Nina.mp3', 'Hindia - Everything U Are.mp3', 'Hindia - Kita Ke Sana.mp3', 'Kendis - Ours to keep.mp3'];
+                    this.tabs = ['photos', 'videos', 'songs'];
+                },
+                nextTab() {
+                    const currentIndex = this.tabs.indexOf(this.activeTab);
+                    const nextIndex = (currentIndex + 1) % this.tabs.length;
+                    this.activeTab = this.tabs[nextIndex];
+                },
+                prevTab() {
+                    const currentIndex = this.tabs.indexOf(this.activeTab);
+                    const prevIndex = (currentIndex - 1 + this.tabs.length) % this.tabs.length;
+                    this.activeTab = this.tabs[prevIndex];
+                },
+                startGallery() {
+                    this.started = true;
+                    this.showContent = true;
+                }
+            }));
+        });
+    </script>
+</body>
+</html>
