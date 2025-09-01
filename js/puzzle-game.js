@@ -1,6 +1,6 @@
 // Sliding Puzzle Game
 function createPuzzleGame(updateHighScore) {
-    const samplePhoto = 'photo1.jpg';
+    const samplePhoto = 'mm2.jpg';
     return {
         grid: [],
         emptyCell: { x: 3, y: 3 },
