@@ -9,9 +9,9 @@
                 this.showContent = true;
                 this.activeTab = 'photos';
                 this.activeIndex = 0;
-                this.photos = ['photo1.jpg', 'photo2.jpg', 'photo3.jpg', 'photo4.jpg'];
-                this.videos = ['video1.mp4', 'video2.mp4'];
-                this.songs = ['Taylor Swift - White Horse.mp3', 'Chase Atlantic - Swim.mp3', 'NIKI - You ll Be in My Heart.mp3'];
+                this.photos = ['photo1.jpg', '2.jpg', '3.jpg', '4.jpg', '5.jpg', '6.jpg', '7.jpg', '8.jpg'];
+                this.videos = ['1.mp4', '2.mp4', '3.mp4', '4.mp4', '5.mp4', '6.mp4', '7.mp4', '8.mp4', '9.mp4', '10.mp4'];
+                this.songs = ['Taylor Swift - White Horse.mp3', 'Chase Atlantic - Swim.mp3', 'NIKI - You ll Be in My Heart.mp3', '.Feast - Nina.mp3', 'Hindia - Everything U Are.mp3', 'Hindia - Kita Ke Sana.mp3', 'Kendis - Ours to keep.mp3'];
                 this.tabs = ['photos', 'videos', 'songs'];
             },
             nextTab() {

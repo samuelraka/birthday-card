@@ -8,8 +8,8 @@ function createMemoryGame(updateHighScore, onGameOver) {
         moves: 0,
         gameStarted: false,
         gameOver: false,
-        photos: ['photo1.jpg', 'photo2.jpg', 'photo3.jpg', 'photo4.jpg'],
-        maxMoves: 6,
+        photos: ['mm1.jpg', 'mm2.jpg', 'mm3.jpg', 'mm4.jpg', 'mm5.jpg', 'photo2.jpg'],
+        maxMoves: 7,
 
         init() {
             this.initializeCards();
